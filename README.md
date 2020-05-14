@@ -24,7 +24,7 @@ A rather obscure sorting algorithm called **MedianSort**:
 The basic idea is to sort the array by calling the `quick_select` function on
 a predefined set of semi-open intervals that only depends on `length`.
 
-Sounds complicated, but it is just QuickSort in disguisse.
+Sounds complicated, but it is just QuickSort in disguise.
 
 For an array of length 16, the set of intervals will be:
 
@@ -48,14 +48,14 @@ For an array of length 16, the set of intervals will be:
                                                             [<--M-->)
 ```
 
-This interval structure mimmics the one you would find in QuickSort's best
+This interval structure mimics the one you would find in QuickSort's best
 case (picking the median as pivot every single time) but here we are
 enforcing it artificially, which hurts the efficiency a bit.
 
 In exchange, we gain A LOT of predictability: Knowing in advance the interval
 structure means that we don't need to store the interval limits at all,
 freeing us from using recursive calls (like QuickSort does) or a stack of
-unsolved problems (like Iterative Quicksort does) to bookkeep them.
+unsolved problems (like Iterative Quicksort does) to book-keep them.
 
 Apart from giving us a non-recursive, truly `O(1)` space, QuickSort variant,
 this interval structure works well with the modern processor's cache hierarchy,
@@ -81,7 +81,7 @@ even for arrays of lengths that are not a power of 2:
 ## Improvements
 
 Since all the work is done by the `quick_select` function, it is fundamental to
-use a good implementation. After all, **MedianSort** inherites all its good
+use a good implementation. After all, **MedianSort** inherits all its good
 properties from the `quick_select` function that you use. In particular:
 
 * If `quick_select` uses `O(1)` space, **MedianSort** will use `O(1)` space.
@@ -91,17 +91,17 @@ properties from the `quick_select` function that you use. In particular:
   in `O(length * log(length))` time.
 
 I use a lighting fast `quick_select` function that does not guarantee linear
-performance, but you may preffer to play safe and use a slower `quick_select`
+performance, but you may prefer to play safe and use a slower `quick_select`
 function that works well for all inputs. Since there is a lot of literature on
 `quick_select` variants, you may be able to pick one that suits your needs.
 
 
 Apart from using a good `quick_select` implementation, you can improve the
-performance of the algorithm by just stoping it earlier (to avoid calling
+performance of the algorithm by just stopping it earlier (to avoid calling
 `quick_select` on lots of short intervals) and doing a final `insertion_sort`
 over the whole array. In particular, if you avoid calling `quick_select` on
 intervals that are shorter than `2^(power+1)` (being `power` a non-negative
-paramenter), then the `insertion_sort` step will take `O(2^(power+1) * length)`
+parameter), then the `insertion_sort` step will take `O(2^(power+1) * length)`
 time in the worst case.
 
 ```c
@@ -126,7 +126,7 @@ time in the worst case.
     }
 ```
 
-Indeed, the paramenter `power` can be tuned to adapt **MedianSort** to
+Indeed, the parameter `power` can be tuned to adapt **MedianSort** to
 different degrees of presortedness of the input data (increase it if
 your data is almost sorted, decrease it if your data is fairly random).
 
@@ -140,7 +140,7 @@ in parallel.
 
 ## Benchmark
 
-I've runned a little experiment to test the efficiency of **MedianSort**.
+I've ran a little experiment to test the efficiency of **MedianSort**.
 
 For each array size, I've generated 10 random instances (each cell of the
 array contains an uniformly random integer in the range `[0, size)`) and tested
@@ -148,13 +148,13 @@ my own implementations of `median_sort` and `quick_sort` using as a reference
 the `qsort` function of C. In both cases I've tested different values of `power`
 (including `0`, which avoids using `insertion_sort` at all).
 
-Plotting all together may be a little bit confussing:
+Plotting all together may be a little bit confusing:
 
- <img src="plot1.png" width="600"> 
+ <img src="plot1.png" width="800"> 
 
 So let me summarize the results in this second plot:
 
- <img src="plot2.png" width="600"> 
+ <img src="plot2.png" width="800"> 
 
 As you can see, the best QuickSort version, `quick_sort(6)`, is twice as fast as
 `qsort` on average, while the best **MedianSort** version, `median_sort(6)`, is
@@ -162,7 +162,7 @@ just 40% better than `qsort` on average.
 
 In both cases, using `insertion_sort` is clearly helping, since the performance
 of their pure counterparts, `quick_sort(0)` and `median_sort(0)`, is on the
-lower end of their respective spectrums.
+lower end of their respective spectra.
 
 For the sake of completeness, I've also plotted the performance of my own
 implementation of `heap_sort`, often considered as a _fail proof_ sorting
@@ -209,6 +209,6 @@ and Stanley Selkow. But, since a recursive version of **MedianSort** has no
 advantage over QuickSort, the algorithm dissapeared from the second edition
 and fell into an unjustified oblivion.
 
-This PUBLIC DOMAIN prototipe aims to correct that situation. Use this code as
+This PUBLIC DOMAIN prototype aims to correct that situation. Use this code as
 you see fit.
 
