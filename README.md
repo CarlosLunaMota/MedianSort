@@ -190,25 +190,27 @@ The main drawbacks of **MedianSort** are:
 
 ## License
 
-Some days ago I was looking for a practical comparison-based sorting
-algorithm such that:
+Some days ago I was looking for a comparison-based sorting algorithm such that:
 
  * Uses `O(1)` space (strictly) to sort an array.
- * It is fast in practice.
+ * It is fast in practice (and works faster in partially sorted arrays).
  
-After doing some research I was unable to find an algorithm that satisfies
-all both conditions at once so I had to (re)invent **MedianSort**.
+After doing some research I was unable to find a satisfying algorithm so I had
+to (re)invent **MedianSort**.
 
 After another round of research I found that the algorithm was already
 known (as you can expect from such a simple idea) but poorly divulgated.
 
 So far, I've been able to find just ONE reference to **MedianSort** in the
-literature: A recursive version of **MedianSort** appeared in the first edition
-of the book "Algorithms in a Nutshell" by George T. Heineman, Gary Pollice
-and Stanley Selkow. But, since a recursive version of **MedianSort** has no
-advantage over QuickSort, the algorithm dissapeared from the second edition
-and fell into an unjustified oblivion.
+literature (please, provide more references if you are aware of them):
+
+A recursive version of **MedianSort** appeared in the first edition of the book
+_Algorithms in a Nutshell_ by George T. Heineman, Gary Pollice and Stanley
+Selkow.
+
+But, since a recursive version of **MedianSort** has no advantage over
+QuickSort, the algorithm dissapeared from the second edition and fell into an
+unjustified oblivion.
 
 This PUBLIC DOMAIN prototype aims to correct that situation. Use this code as
 you see fit.
-
