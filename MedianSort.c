@@ -3,7 +3,7 @@
 /**  MedianSort.c                                                           **/
 /**  ------------                                                           **/
 /**                                                                         **/
-/** Content: A set of tests for the CLM_LIBS code-generating macros         **/
+/** Content: A generic implementation of the MedianSort algorithm           **/
 /**                                                                         **/
 /** Author:  Carlos Luna Mota                                               **/
 /**                                                                         **/
