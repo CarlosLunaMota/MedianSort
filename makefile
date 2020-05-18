@@ -1,7 +1,7 @@
 
 # Basic parameters
 CC     = gcc 
-CFLAGS = -std=c99 -Wall -Wextra -pedantic -O3
+CFLAGS = -std=c99 -Wall -Wextra -pedantic -O2
 OBJS   = MedianSort.o
 
 %.o: %.c

@@ -58,24 +58,20 @@
     static void quick_select##suffix(type_t *A, const size_t length,            \
                                      const size_t rank) {                       \
                                                                                 \
-        size_t l, low  = 0;                                                     \
-        size_t h, high = length-1;                                              \
-        type_t temp, pivot;                                                     \
+        size_t l, left  = 0;                                                    \
+        size_t r, right = length-1;                                             \
+        type_t t, pivot;                                                        \
                                                                                 \
-        while (low < high) {                                                    \
+        while (left < right) {                                                  \
             pivot = A[rank];                                                    \
-            l     = low;                                                        \
-            h     = high;                                                       \
+            l     = left;                                                       \
+            r     = right;                                                      \
             do {while (less_than(A[l], pivot)) { ++l; }                         \
-                while (less_than(pivot, A[h])) { --h; }                         \
-                if (l <= h) {                                                   \
-                    temp = A[l]; A[l] = A[h]; A[h] = temp;                      \
-                    ++l;                                                        \
-                    --h;                                                        \
-                }                                                               \
-            } while (l <= h);                                                   \
-            if (h < rank) { low  = l; }                                         \
-            if (rank < l) { high = h; }                                         \
+                while (less_than(pivot, A[r])) { --r; }                         \
+                if (l <= r) { t=A[l]; A[l]=A[r]; A[r]=t; ++l; --r; }            \
+            } while (l <= r);                                                   \
+            if (r < rank) { left  = l; }                                        \
+            if (rank < l) { right = r; }                                        \
         }                                                                       \
     }                                                                           \
                                                                                 \
@@ -108,7 +104,7 @@
         }                                                                       \
     }                                                                           \
                                                                                 \
-                                                                                
+                                                                                                                                                               
 #define IMPORT_QUICK_SORT(type_t, less_than, power, suffix)                     \
                                                                                 \
     static void quick_sort##suffix(type_t *A, const size_t length) {            \
@@ -122,8 +118,8 @@
             const type_t pivot = A[length/2];                                   \
                                                                                 \
             for (l = 0, r = length-1; ; ++l, --r) {                             \
-                while (A[l] < pivot) { ++l; }                                   \
-                while (A[r] > pivot) { --r; }                                   \
+                while (less_than(A[l], pivot)) { ++l; }                         \
+                while (less_than(pivot, A[r])) { --r; }                         \
                 if (l >= r) { break; }                                          \
                 t = A[l]; A[l] = A[r]; A[r] = t;                                \
             }                                                                   \
@@ -136,7 +132,7 @@
         else {                                                                  \
             for (r = 1; r < length; ++r) {                                      \
                 t = A[r];                                                       \
-                for (l=r; l>0 && less_than(t, A[l-1]); --l) { A[l] = A[l-1]; }  \
+                for (l=r; l && less_than(t, A[l-1]); --l) { A[l] = A[l-1]; }    \
                 A[l] = t;                                                       \
             }                                                                   \
         }                                                                       \
@@ -150,37 +146,31 @@
         size_t i, j, k;                                                         \
         type_t temp;                                                            \
                                                                                 \
-        /* Max-Heapify the array A[0..length-1] in O(length) */                 \
-        for (i = (length>>1); i > 0; i--) {                                     \
-            j    = i-1;                                                         \
+        for (i = (length>>1); i--> 0; ) {                                       \
+            j    = i;                                                           \
             temp = A[j];                                                        \
-            for (;;) {                                                          \
-                k = (j<<1) + 1;                                                 \
-                if (k+1 >  length) { break; }                                   \
-                if (k+2 <= length && less_than(A[k], A[k+1])) { k++; }          \
-                if (less_than(A[k], temp)) { break; }                           \
-                else { A[j] = A[k]; j = k; }                                    \
+            for (k = (j<<1)+1; k < length; k = (j<<1)+1) {                      \
+                if (k+1 < length && less_than(A[k], A[k+1])) { ++k; }           \
+                if (less_than(temp, A[k])) { A[j] = A[k]; j = k; }              \
+                else                       { break;              }              \
             }                                                                   \
             A[j] = temp;                                                        \
         }                                                                       \
                                                                                 \
-        /* Selection Sort phase in O(length * log(length)) */                   \
-        for (i = length-1; i > 0; i--) {                                        \
+        for (i = length; i--> 1; ) {                                            \
             temp = A[i];                                                        \
             A[i] = A[0];                                                        \
             j    = 0;                                                           \
-            for (;;) {                                                          \
-                k = (j<<1) + 1;                                                 \
-                if (k+1 >  i) { break; }                                        \
-                if (k+2 <= i && less_than(A[k], A[k+1])) { k++; }               \
-                if (less_than(A[k], temp)) { break; }                           \
-                else { A[j] = A[k]; j = k; }                                    \
+            for (k = (j<<1)+1; k < i; k = (j<<1)+1) {                           \
+                if (k+1 < i && less_than(A[k], A[k+1])) { ++k; }                \
+                if (less_than(temp, A[k])) { A[j] = A[k]; j = k; }              \
+                else                       { break;              }              \
             }                                                                   \
             A[j] = temp;                                                        \
         }                                                                       \
     }                                                                           \
                                                                                 \
-
+    
 /** AUXILIARY FUNCTIONS *************************************************** **/
 
 int comp_int(const void *i, const void *j) {
@@ -191,14 +181,14 @@ int comp_int(const void *i, const void *j) {
 
 int rand_int(const int n) {
 
-        /* Preconditions */
-        assert(n > 0);
-        assert(RAND_MAX >= n);
+    /* Preconditions */
+    assert(n > 0);
+    assert(RAND_MAX >= n);
 
-        /* Monte-Carlo uniformly random generator */
-        int r, range = RAND_MAX - (RAND_MAX % n);
-        do { r = rand(); } while (r >= range);
-        return r % n;
+    /* Monte-Carlo uniformly random generator */
+    int r, range = RAND_MAX - (RAND_MAX % n);
+    do { r = rand(); } while (r >= range);
+    return r % n;
 }
 
 IMPORT_MEDIAN_SORT(int, LESS_THAN, 0, _0)
@@ -232,7 +222,7 @@ int main (void) {
     clock_t crono;
     size_t i, j, step, size;
 
-    const size_t repeat = 10;
+    const size_t repeat = 100;
     const size_t steps  = 5;
 
     double T[22][steps];
@@ -429,8 +419,7 @@ int main (void) {
     for (i = 0; i < 10; i++) { printf(" QuickSort(%zu)", i);  }
     for (step = 0; step < steps; step++) {
         printf("\n%zu %.2f %.2f", S[step], 100.0, 100.0 * T[21][step] / T[20][step]);
-        for (i =  0; i < 10; i++) { printf(" %.2f", 100.0 * T[i][step] / T[20][step]); }
-        for (i = 10; i < 20; i++) { printf(" %.2f", 100.0 * T[i][step] / T[20][step]); }
+        for (i =  0; i < 20; i++) { printf(" %.2f", 100.0 * T[i][step] / T[20][step]); }
     }
     
     free(buffer);
