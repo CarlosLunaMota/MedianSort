@@ -153,7 +153,12 @@ my own implementations of `median_sort` and `quick_sort` using as a reference
 the `qsort` function of C. In both cases I've tested different values of `power`
 (including `0`, which avoids using `insertion_sort` at all).
 
-Plotting everything together may be a little bit confusing:
+For the sake of completeness, I've also plotted the performance of my own
+implementation of `heap_sort`, often considered as a _fail proof_ sorting
+algorithm, but way slower than the alternatives for large arrays because of
+its inherent poor cache performance.
+
+Trying to plot everything at once may be a little bit confusing:
 
  <img src="plot1.png" width="800"> 
 
@@ -167,15 +172,11 @@ And then let me clean a little bit this second plot:
 
 As you can see, the best QuickSort version, `quick_sort(7)`, is almost twice as fast as
 `qsort` on average, while the best **MedianSort** version, `median_sort(7)`, is
-about 35% better than `qsort` on average.
+just about 35% better than `qsort` on average.
 
 In both cases, using `insertion_sort` is clearly helping, since the performance
 of their pure counterparts, `quick_sort(0)` and `median_sort(0)`, is on the
 lower end of their respective spectra.
-
-For the sake of completeness, I've also plotted the performance of my own
-implementation of `heap_sort`, often considered as a _fail proof_ sorting
-algorithm but way slower than the alternatives for large arrays.
 
 
 
