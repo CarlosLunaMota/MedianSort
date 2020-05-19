@@ -59,8 +59,8 @@ unsolved problems (like Iterative Quicksort does) to book-keep them.
 
 Apart from giving us a non-recursive, truly `O(1)` space, QuickSort variant,
 this interval structure works well with the modern processor's cache hierarchy,
-since almost all the intervals end up having lengths that are a powers of 2,
-even for arrays of lengths that are not a power of 2:
+since the memory is processed in consecutive segments whose length is a power
+of 2 (even for arrays of lengths that are not a power of 2):
 
 ```
     0   1   2   3   4   5   6   7   8   9  10  11
@@ -76,6 +76,11 @@ even for arrays of lengths that are not a power of 2:
                             [<--M-->)
                                     [<--M-->)
 ```
+
+Note that the last segment of each iteration is the only one that may not have
+a length that is a power of two (and we will not look for the median in those
+cases). Note also that a interval is not processed at all if its "center" falls
+outside the array limits.
 
 
 ## Improvements
@@ -132,7 +137,7 @@ your data is almost sorted, decrease it if your data is fairly random).
 
 
 Finally, an obvious optimization (that I haven't tried so far) is to
-parallelize the `quick_select` calls. This is trivially easy since all the
+parallelize the `quick_select` calls. This is trivially easy, since all the
 intervals of the same size are disjoint by definition and can be processed
 in parallel.
 
@@ -142,23 +147,27 @@ in parallel.
 
 I've ran a little experiment to test the efficiency of **MedianSort**.
 
-For each array size, I've generated 10 random instances (each cell of the
+For each array size, I've generated 100 random instances (each cell of the
 array contains an uniformly random integer in the range `[0, size)`) and tested
 my own implementations of `median_sort` and `quick_sort` using as a reference
 the `qsort` function of C. In both cases I've tested different values of `power`
 (including `0`, which avoids using `insertion_sort` at all).
 
-Plotting all together may be a little bit confusing:
+Plotting everything together may be a little bit confusing:
 
  <img src="plot1.png" width="800"> 
 
-So let me summarize the results in this second plot:
+So let me zoom on the interesting range:
 
  <img src="plot2.png" width="800"> 
 
-As you can see, the best QuickSort version, `quick_sort(6)`, is twice as fast as
-`qsort` on average, while the best **MedianSort** version, `median_sort(6)`, is
-just 40% better than `qsort` on average.
+And then let me clean a little bit this second plot:
+
+ <img src="plot3.png" width="800"> 
+
+As you can see, the best QuickSort version, `quick_sort(7)`, is almost twice as fast as
+`qsort` on average, while the best **MedianSort** version, `median_sort(7)`, is
+about 35% better than `qsort` on average.
 
 In both cases, using `insertion_sort` is clearly helping, since the performance
 of their pure counterparts, `quick_sort(0)` and `median_sort(0)`, is on the
@@ -212,6 +221,6 @@ But, since a recursive version of **MedianSort** has no advantage over
 QuickSort, the algorithm dissapeared from the second edition and fell into an
 unjustified oblivion.
 
-This PUBLIC DOMAIN prototype aims to correct that situation. Use this code as
-you see fit.
+This PUBLIC DOMAIN GENERIC TEMPLATE aims to correct that situation. Use this
+code as you see fit.
 

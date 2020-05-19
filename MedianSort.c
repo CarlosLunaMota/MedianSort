@@ -46,7 +46,7 @@
 #include <stdlib.h>     /* Memory allocation and random functions.           */
 #include <string.h>     /* The size_t type.                                  */
 #include <time.h>       /* Time functions.                                   */
-#include <math.h>       /* The pow function.                                 */ 
+#include <math.h>       /* The pow function.                                 */
 
 
 /** GENERIC SORTING FUNCTION TEMPLATES ************************************ **/
@@ -104,7 +104,7 @@
         }                                                                       \
     }                                                                           \
                                                                                 \
-                                                                                                                                                               
+
 #define IMPORT_QUICK_SORT(type_t, less_than, power, suffix)                     \
                                                                                 \
     static void quick_sort##suffix(type_t *A, const size_t length) {            \
@@ -139,9 +139,9 @@
     }                                                                           \
                                                                                 \
 
-#define IMPORT_HEAP_SORT(type_t, less_than, suffix)                             \
+#define IMPORT_HEAP_SORT(type_t, less_than)                                     \
                                                                                 \
-    static void heap_sort##suffix(type_t *A, const size_t length) {             \
+    static void heap_sort(type_t *A, const size_t length) {                     \
                                                                                 \
         size_t i, j, k;                                                         \
         type_t temp;                                                            \
@@ -170,7 +170,7 @@
         }                                                                       \
     }                                                                           \
                                                                                 \
-    
+
 /** AUXILIARY FUNCTIONS *************************************************** **/
 
 int comp_int(const void *i, const void *j) {
@@ -213,7 +213,7 @@ IMPORT_QUICK_SORT(int, LESS_THAN, 7, _7)
 IMPORT_QUICK_SORT(int, LESS_THAN, 8, _8)
 IMPORT_QUICK_SORT(int, LESS_THAN, 9, _9)
 
-IMPORT_HEAP_SORT(int, LESS_THAN, )
+IMPORT_HEAP_SORT(int, LESS_THAN)
 
 /** MAIN ****************************************************************** **/
 
@@ -223,7 +223,7 @@ int main (void) {
     size_t i, j, step, size;
 
     const size_t repeat = 100;
-    const size_t steps  = 5;
+    const size_t steps  = 6;
 
     double T[22][steps];
     size_t S[steps];
@@ -233,7 +233,7 @@ int main (void) {
     int *random = (int *) malloc(S[steps-1] * sizeof(int));  assert(random);
     int *sorted = (int *) malloc(S[steps-1] * sizeof(int));  assert(sorted);
     int *array  = (int *) malloc(S[steps-1] * sizeof(int));  assert(array);
-    
+
     for (step = 0, size = 10; step < steps; step++) {
 
         size = S[step];
@@ -421,7 +421,7 @@ int main (void) {
         printf("\n%zu %.2f %.2f", S[step], 100.0, 100.0 * T[21][step] / T[20][step]);
         for (i =  0; i < 20; i++) { printf(" %.2f", 100.0 * T[i][step] / T[20][step]); }
     }
-    
+
     free(buffer);
     free(random);
     free(sorted);
