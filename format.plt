@@ -9,7 +9,7 @@ min(x,y) = (x < y) ? x : y
 max(x,y) = (x > y) ? x : y
 
 set output  'plot1.png'
-set title   "{/=20 MedianSort vs QuickSort vs HeapSort}\n(average performance for 100 uniformly random instances of each size)"
+set title   "{/=20 MedianSort vs QuickSort vs HeapSort vs ShellSort}\n(average performance for 100 uniformly random instances of each size)"
 set ytics   out nomirror 10
 set y2tics  out nomirror 10
 set yrange  [0:*]
@@ -17,6 +17,7 @@ set y2range [0:*]
 
 plot 'log.txt' using 1:2  with linespoints lw 3 pt  7 lc rgb "#000000", \
      'log.txt' using 1:3  with linespoints lw 3 pt  5 lc rgb "#11CC11", \
+     'log.txt' using 1:24 with linespoints lw 3 pt  5 lc rgb "#990099", \
      'log.txt' using 1:4  with linespoints lw 2 pt  5 lc rgb "#FFAAAA", \
      'log.txt' using 1:5  with linespoints lw 2 pt  7 lc rgb "#FF9999", \
      'log.txt' using 1:6  with linespoints lw 2 pt  9 lc rgb "#FF8888", \
@@ -45,6 +46,7 @@ set y2tics  out nomirror 5
 
 plot 'log.txt' using 1:2  with linespoints lw 3 pt  7 lc rgb "#000000", \
      'log.txt' using 1:3  with linespoints lw 3 pt  5 lc rgb "#11CC11", \
+     'log.txt' using 1:24 with linespoints lw 3 pt  5 lc rgb "#990099", \
      'log.txt' using 1:4  with linespoints lw 2 pt  5 lc rgb "#FFAAAA", \
      'log.txt' using 1:5  with linespoints lw 2 pt  7 lc rgb "#FF9999", \
      'log.txt' using 1:6  with linespoints lw 2 pt  9 lc rgb "#FF8888", \
@@ -71,6 +73,7 @@ plot 'log.txt' using 1:(min($4,min($5,min($6,min($7,min($8,min($9,min($10,min($1
      'log.txt' using 1:(min($14,min($15,min($16,min($17,min($18,min($19,min($20,min($21,$22))))))))):(max($14,max($15,max($16,max($17,max($18,max($19,max($20,max($21,$21))))))))) with filledcurves lc rgb "#1111CC" fs transparent solid 0.15 notitle, \
      'log.txt' using 1:2  with linespoints lw 3 pt 7 lc rgb "#000000", \
      'log.txt' using 1:3  with linespoints lw 3 pt 7 lc rgb "#11CC11", \
+     'log.txt' using 1:24 with linespoints lw 3 pt 5 lc rgb "#990099", \
      'log.txt' using 1:4  with linespoints lw 2 pt 0 lc rgb "#CC1111", \
      'log.txt' using 1:11 with linespoints lw 3 pt 7 lc rgb "#CC1111", \
      'log.txt' using 1:14 with linespoints lw 2 pt 0 lc rgb "#1111CC", \

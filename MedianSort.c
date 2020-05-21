@@ -171,6 +171,52 @@
     }                                                                           \
                                                                                 \
 
+#define IMPORT_SHELL_SORT(type_t, less_than)                                    \
+                                                                                \
+    static void shell_sort(type_t *A, const size_t length) {                    \
+                                                                                \
+        /* The first 54 gaps of the Tokuda sequence: ceil((9*((9/4)^n)-4)/5) */ \
+        /* Enough for 64 bit machines. Pre-computed for efficiency.          */ \
+        size_t gaps[54] = {1u, 4u, 9u, 20u, 46u, 103u, 233u, 525u, 1182u,       \
+                           2660u, 5985u, 13467u, 30301u, 68178u, 153401u,       \
+                           345152u, 776591u, 1747331u, 3931496u, 8845866u,      \
+                           19903198u, 44782196u, 100759940u, 226709866u,        \
+                           510097200u, 1147718700u, 2582367076u, 5810325920u,   \
+                           13073233321u, 29414774973u, 66183243690u,            \
+                           148912298303u, 335052671183u, 753868510162u,         \
+                           1696204147864u, 3816459332694u, 8587033498562u,      \
+                           19320825371765u, 43471857086472u, 97811678444563u,   \
+                           220076276500268u, 495171622125603u,                  \
+                           1114136149782608u, 2506806337010868u,                \
+                           5640314258274455u, 12690707081117524u,               \
+                           28554090932514432u, 64246704598157464u,              \
+                           144555085345854304u, 325248942028172160u,            \
+                           731810119563387392u, 1646572769017621760u,           \
+                           3704788730289648640u, 8335774643151711232u };        \
+                                                                                \
+        size_t i, l, r, gap;                                                    \
+        type_t temp;                                                            \
+                                                                                \
+        /* Find the starting gap */                                             \
+        for (i = 1; i < 54 && gaps[i] < length; ++i);                           \
+                                                                                \
+        /* Shell Sort */                                                        \
+        do {gap = gaps[--i];                                                    \
+            for (r = gap; r < length; ++r) {                                    \
+                temp = A[r];                                                    \
+                l    = r;                                                       \
+                while (less_than(temp, A[l-gap])) {                             \
+                    A[l] = A[l-gap];                                            \
+                    l   -= gap;                                                 \
+                    if (l < gap) { break; }                                     \
+                }                                                               \
+                A[l] = temp;                                                    \
+            }                                                                   \
+        } while (gap > 1);                                                      \
+    }                                                                           \
+                                                                                \
+
+
 /** AUXILIARY FUNCTIONS *************************************************** **/
 
 int comp_int(const void *i, const void *j) {
@@ -215,6 +261,8 @@ IMPORT_QUICK_SORT(int, LESS_THAN, 9, _9)
 
 IMPORT_HEAP_SORT(int, LESS_THAN)
 
+IMPORT_SHELL_SORT(int, LESS_THAN)
+
 /** MAIN ****************************************************************** **/
 
 int main (void) {
@@ -225,7 +273,7 @@ int main (void) {
     const size_t repeat = 100;
     const size_t steps  = 6;
 
-    double T[22][steps];
+    double T[23][steps];
     size_t S[steps];
     for (step = 1, S[0] = 1000; step < steps; S[step] = S[step-1]*10, step++);
 
@@ -237,7 +285,7 @@ int main (void) {
     for (step = 0, size = 10; step < steps; step++) {
 
         size = S[step];
-        for (i = 0; i < 22; i++) { T[i][step] = 0.0; }
+        for (i = 0; i < 23; i++) { T[i][step] = 0.0; }
 
         fprintf(stderr, "\nSORTING %zu RANDOM INTS IN THE RANGE [0,%zu)\n", size, size);
 
@@ -261,6 +309,14 @@ int main (void) {
             crono = clock();
             heap_sort(array, size);
             T[21][step] += ((double) (clock() - crono)) / CLOCKS_PER_SEC;
+            for (i = 0; i < size; i++) { assert(array[i] == sorted[i]); }
+
+            /*** TEST SHELL SORT *********************************************/
+
+            for (i = 0; i < size; i++) { array[i] = random[i]; }
+            crono = clock();
+            shell_sort(array, size);
+            T[22][step] += ((double) (clock() - crono)) / CLOCKS_PER_SEC;
             for (i = 0; i < size; i++) { assert(array[i] == sorted[i]); }
 
             /*** TEST MEDIAN SORT ********************************************/
@@ -392,6 +448,7 @@ int main (void) {
         }
 
         fprintf(stderr, "\n    heap_sort   vs qsort = %+.2f %%\n", 100.0 * (T[21][step]-T[20][step]) / T[20][step]);
+        fprintf(stderr,   "   shell_sort   vs qsort = %+.2f %%\n", 100.0 * (T[22][step]-T[20][step]) / T[20][step]);
         fprintf(stderr, "\n  median_sort_0 vs qsort = %+.2f %%\n", 100.0 * (T[ 0][step]-T[20][step]) / T[20][step]);
         fprintf(stderr,   "   quick_sort_0 vs qsort = %+.2f %%\n", 100.0 * (T[10][step]-T[20][step]) / T[20][step]);
         fprintf(stderr, "\n  median_sort_1 vs qsort = %+.2f %%\n", 100.0 * (T[ 1][step]-T[20][step]) / T[20][step]);
@@ -417,9 +474,11 @@ int main (void) {
     printf("Size qsort HeapSort");
     for (i = 0; i < 10; i++) { printf(" MedianSort(%zu)", i); }
     for (i = 0; i < 10; i++) { printf(" QuickSort(%zu)", i);  }
+    printf(" ShellSort");
     for (step = 0; step < steps; step++) {
         printf("\n%zu %.2f %.2f", S[step], 100.0, 100.0 * T[21][step] / T[20][step]);
         for (i =  0; i < 20; i++) { printf(" %.2f", 100.0 * T[i][step] / T[20][step]); }
+        printf(" %.2f", 100.0 * T[22][step] / T[20][step]);
     }
 
     free(buffer);

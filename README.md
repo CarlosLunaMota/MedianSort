@@ -154,9 +154,10 @@ the `qsort` function of C. In both cases I've tested different values of `power`
 (including `0`, which avoids using `insertion_sort` at all).
 
 For the sake of completeness, I've also plotted the performance of my own
-implementation of `heap_sort`, often considered as a _fail proof_ sorting
-algorithm, but way slower than the alternatives for large arrays because of
-its inherent poor cache performance.
+implementation of `heap_sort` and `shell_sort`, two commonly used sorting
+algorithms that also require `O(1)` additional space in the strict sense.
+As you can see, both are slower than `qsort` for large arrays (this is
+specially true for `heap_sort` because of its inherent bad caché performance).
 
 Trying to plot everything at once may be a little bit confusing:
 
