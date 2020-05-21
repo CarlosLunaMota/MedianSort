@@ -53,10 +53,10 @@
 
 #define LESS_THAN(i, j) ((i) < (j))
 
-#define IMPORT_MEDIAN_SORT(type_t, less_than, power, suffix)                    \
+#define IMPORT_MEDIAN_SORT(type_t, less_than, power, prefix, suffix)            \
                                                                                 \
-    static void quick_select##suffix(type_t *A, const size_t length,            \
-                                     const size_t rank) {                       \
+    static void prefix##quick_select##suffix(type_t *A, const size_t length,    \
+                                             const size_t rank) {               \
                                                                                 \
         size_t l, left  = 0;                                                    \
         size_t r, right = length-1;                                             \
@@ -75,7 +75,7 @@
         }                                                                       \
     }                                                                           \
                                                                                 \
-    static void median_sort##suffix(type_t *A, const size_t length) {           \
+    static void prefix##median_sort##suffix(type_t *A, const size_t length) {   \
                                                                                 \
         const size_t MIN_SIZE = 1 << power;                                     \
                                                                                 \
@@ -90,7 +90,7 @@
                 r = (rank+step) > length ? length : (rank+step);                \
                                                                                 \
                 /* QUICK SELECT rank in the interval [l, r) */                  \
-                quick_select##suffix(A+l, r-l, step);                           \
+                prefix##quick_select##suffix(A+l, r-l, step);                   \
             }                                                                   \
         }                                                                       \
                                                                                 \
@@ -98,16 +98,16 @@
         if (MIN_SIZE > 1) {                                                     \
             for (r = 1; r < length; ++r) {                                      \
                 t = A[r];                                                       \
-                for (l=r; l>0 && less_than(t, A[l-1]); --l) { A[l] = A[l-1]; }  \
+                for (l=r; l && less_than(t, A[l-1]); --l) { A[l] = A[l-1]; }    \
                 A[l] = t;                                                       \
             }                                                                   \
         }                                                                       \
     }                                                                           \
                                                                                 \
 
-#define IMPORT_QUICK_SORT(type_t, less_than, power, suffix)                     \
+#define IMPORT_QUICK_SORT(type_t, less_than, power, prefix, suffix)             \
                                                                                 \
-    static void quick_sort##suffix(type_t *A, const size_t length) {            \
+    static void prefix##quick_sort##suffix(type_t *A, const size_t length) {    \
                                                                                 \
         size_t l, r;                                                            \
         type_t t;                                                               \
@@ -124,8 +124,8 @@
                 t = A[l]; A[l] = A[r]; A[r] = t;                                \
             }                                                                   \
                                                                                 \
-            quick_sort##suffix(A,   l);                                         \
-            quick_sort##suffix(A+l, length-l);                                  \
+            prefix##quick_sort##suffix(A,   l);                                 \
+            prefix##quick_sort##suffix(A+l, length-l);                          \
         }                                                                       \
                                                                                 \
         /* INSERTION SORT (up to 2^power distances) */                          \
@@ -139,17 +139,16 @@
     }                                                                           \
                                                                                 \
 
-#define IMPORT_HEAP_SORT(type_t, less_than)                                     \
+#define IMPORT_HEAP_SORT(type_t, less_than, prefix, suffix)                     \
                                                                                 \
-    static void heap_sort(type_t *A, const size_t length) {                     \
+    static void prefix##heap_sort##suffix(type_t *A, const size_t length) {     \
                                                                                 \
         size_t i, j, k;                                                         \
         type_t temp;                                                            \
                                                                                 \
         for (i = (length>>1); i--> 0; ) {                                       \
-            j    = i;                                                           \
-            temp = A[j];                                                        \
-            for (k = (j<<1)+1; k < length; k = (j<<1)+1) {                      \
+            temp = A[i];                                                        \
+            for (j = i, k = (i<<1)+1; k < length; k = (j<<1)+1) {               \
                 if (k+1 < length && less_than(A[k], A[k+1])) { ++k; }           \
                 if (less_than(temp, A[k])) { A[j] = A[k]; j = k; }              \
                 else                       { break;              }              \
@@ -160,8 +159,7 @@
         for (i = length; i--> 1; ) {                                            \
             temp = A[i];                                                        \
             A[i] = A[0];                                                        \
-            j    = 0;                                                           \
-            for (k = (j<<1)+1; k < i; k = (j<<1)+1) {                           \
+            for (j = 0, k = 1; k < i; k = (j<<1)+1) {                           \
                 if (k+1 < i && less_than(A[k], A[k+1])) { ++k; }                \
                 if (less_than(temp, A[k])) { A[j] = A[k]; j = k; }              \
                 else                       { break;              }              \
@@ -171,12 +169,12 @@
     }                                                                           \
                                                                                 \
 
-#define IMPORT_SHELL_SORT(type_t, less_than)                                    \
+#define IMPORT_SHELL_SORT(type_t, less_than, prefix, suffix)                    \
                                                                                 \
-    static void shell_sort(type_t *A, const size_t length) {                    \
+    static void prefix##shell_sort##suffix(type_t *A, const size_t length) {    \
                                                                                 \
         /* The first 54 gaps of Tokuda's sequence: ceil((9*((9/4)^n)-4)/5) */   \
-        /* Enough for all 64 bit machines. Pre-computed for efficiency.    */   \
+        /* Enough for 64 bit machines. Pre-computed for efficiency.        */   \
         const size_t gaps[54] = {1u, 4u, 9u, 20u, 46u, 103u, 233u, 525u, 1182u, \
                                  2660u, 5985u, 13467u, 30301u, 68178u, 153401u, \
                                  345152u, 776591u, 1747331u, 3931496u,          \
@@ -239,31 +237,31 @@ int rand_int(const int n) {
     return r % n;
 }
 
-IMPORT_MEDIAN_SORT(int, LESS_THAN, 0, _0)
-IMPORT_MEDIAN_SORT(int, LESS_THAN, 1, _1)
-IMPORT_MEDIAN_SORT(int, LESS_THAN, 2, _2)
-IMPORT_MEDIAN_SORT(int, LESS_THAN, 3, _3)
-IMPORT_MEDIAN_SORT(int, LESS_THAN, 4, _4)
-IMPORT_MEDIAN_SORT(int, LESS_THAN, 5, _5)
-IMPORT_MEDIAN_SORT(int, LESS_THAN, 6, _6)
-IMPORT_MEDIAN_SORT(int, LESS_THAN, 7, _7)
-IMPORT_MEDIAN_SORT(int, LESS_THAN, 8, _8)
-IMPORT_MEDIAN_SORT(int, LESS_THAN, 9, _9)
+IMPORT_MEDIAN_SORT(int, LESS_THAN, 0, , _0)
+IMPORT_MEDIAN_SORT(int, LESS_THAN, 1, , _1)
+IMPORT_MEDIAN_SORT(int, LESS_THAN, 2, , _2)
+IMPORT_MEDIAN_SORT(int, LESS_THAN, 3, , _3)
+IMPORT_MEDIAN_SORT(int, LESS_THAN, 4, , _4)
+IMPORT_MEDIAN_SORT(int, LESS_THAN, 5, , _5)
+IMPORT_MEDIAN_SORT(int, LESS_THAN, 6, , _6)
+IMPORT_MEDIAN_SORT(int, LESS_THAN, 7, , _7)
+IMPORT_MEDIAN_SORT(int, LESS_THAN, 8, , _8)
+IMPORT_MEDIAN_SORT(int, LESS_THAN, 9, , _9)
 
-IMPORT_QUICK_SORT(int, LESS_THAN, 0, _0)
-IMPORT_QUICK_SORT(int, LESS_THAN, 1, _1)
-IMPORT_QUICK_SORT(int, LESS_THAN, 2, _2)
-IMPORT_QUICK_SORT(int, LESS_THAN, 3, _3)
-IMPORT_QUICK_SORT(int, LESS_THAN, 4, _4)
-IMPORT_QUICK_SORT(int, LESS_THAN, 5, _5)
-IMPORT_QUICK_SORT(int, LESS_THAN, 6, _6)
-IMPORT_QUICK_SORT(int, LESS_THAN, 7, _7)
-IMPORT_QUICK_SORT(int, LESS_THAN, 8, _8)
-IMPORT_QUICK_SORT(int, LESS_THAN, 9, _9)
+IMPORT_QUICK_SORT(int, LESS_THAN, 0, , _0)
+IMPORT_QUICK_SORT(int, LESS_THAN, 1, , _1)
+IMPORT_QUICK_SORT(int, LESS_THAN, 2, , _2)
+IMPORT_QUICK_SORT(int, LESS_THAN, 3, , _3)
+IMPORT_QUICK_SORT(int, LESS_THAN, 4, , _4)
+IMPORT_QUICK_SORT(int, LESS_THAN, 5, , _5)
+IMPORT_QUICK_SORT(int, LESS_THAN, 6, , _6)
+IMPORT_QUICK_SORT(int, LESS_THAN, 7, , _7)
+IMPORT_QUICK_SORT(int, LESS_THAN, 8, , _8)
+IMPORT_QUICK_SORT(int, LESS_THAN, 9, , _9)
 
-IMPORT_HEAP_SORT(int, LESS_THAN)
+IMPORT_HEAP_SORT(int, LESS_THAN, , )
 
-IMPORT_SHELL_SORT(int, LESS_THAN)
+IMPORT_SHELL_SORT(int, LESS_THAN, , )
 
 /** MAIN ****************************************************************** **/
 
